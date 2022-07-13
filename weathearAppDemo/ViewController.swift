@@ -34,7 +34,8 @@ class ViewController: UIViewController {
 
     var currentLocation: CLLocation?
     var cities: [RenderableCityInfo] = []
-    var selectedCity = 0
+    var currentCityRenderableInfo:RenderableCityInfo?
+//    var selectedCity = 0
     var cityNameString: String = ""
     var navBarAccessory:UIToolbar = UIToolbar()
     var locationLabel:UILabel = UILabel()
@@ -47,7 +48,7 @@ class ViewController: UIViewController {
             self.retrieveLocationOnAppStartup()
         }
         
-        // Moved search/nav bar here since there was UI issue if you tapped on search/done repeatedly very quickly
+        // Moved search/nav bar here since there was a UI issue if you tapped on search/done repeatedly very quickly
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(cityPickerController))
     }
     
@@ -65,6 +66,7 @@ class ViewController: UIViewController {
         hourlyWeatherCollectionView.layer.borderColor = UIColor.lightGray.cgColor
         hourlyWeatherCollectionView.layer.borderWidth = 1.0
         hourlyWeatherCollectionView.layer.cornerRadius = 3.0
+//        currentCityRenderableInfo = cities.first
     }
     
     
@@ -75,7 +77,6 @@ class ViewController: UIViewController {
         }
         let long: Int = Int(currentLocation.coordinate.longitude)
         let lat: Int = Int(currentLocation.coordinate.latitude)
-        
         
         let currentLocationForecast = RenderableCityInfo(long: long, lat: lat, cityName: "Current Location", currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: cityNameString))
         let chicagoForecast = RenderableCityInfo(long: Int(-87.623), lat: Int(41.881), cityName: "Chicago",  currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: "Chicago"))
@@ -97,8 +98,14 @@ class ViewController: UIViewController {
         picker.delegate = self
         picker.dataSource = self
         picker.isHidden = false
-        picker.selectRow(selectedCity, inComponent: 0, animated: false)
-
+        let indexOfCurrentlySelectedCity = cities.firstIndex { element in
+            if (element.cityName == currentCityRenderableInfo?.cityName) {
+                return true
+            } else {
+                return false
+            }
+        }
+        picker.selectRow(indexOfCurrentlySelectedCity ?? 0, inComponent: 0, animated: false)
         self.view.addSubview(picker)
         picker.center = self.view.center
         
@@ -116,15 +123,22 @@ class ViewController: UIViewController {
     }
     
     @objc func doneButtonTapped() {
-        let index = picker.selectedRow(inComponent: 0)
-        let currentCity = cities[index]
-        selectedCity = index
+        let indexOfCurrentlySelectedCity = cities.firstIndex { element in
+                   if (element.cityName == currentCityRenderableInfo?.cityName) {
+                       return true
+                   } else {
+                       return false
+                   }
+               }
+        let currentCity = cities[indexOfCurrentlySelectedCity ?? 0]
+        currentCityRenderableInfo = currentCity
         
         DispatchQueue.main.async {
             self.requestWeatherForLocation(long: currentCity.long, lat: currentCity.lat)
         }
+        
         self.cityNameString = currentCity.cityName
-        if index == 0 {
+        if indexOfCurrentlySelectedCity == 0 {
             self.locationManager.requestLocation()
             self.locationManager.stopUpdatingLocation()
         }
@@ -138,7 +152,6 @@ class ViewController: UIViewController {
         navBarAccessory.isHidden = true
         self.navigationController?.isNavigationBarHidden = false
     }
-    
     
     func retrieveLocationOnAppStartup() {
         self.locationManager.delegate = self
@@ -173,8 +186,16 @@ class ViewController: UIViewController {
             let hourlyEntries =  Array(results.hourly[1...12])
             
             DispatchQueue.main.async {
-                let index = self.picker.selectedRow(inComponent: 0)
-                var selectedCity = self.cities[index]
+                let indexOfCurrentlySelectedCity = self.cities.firstIndex { element in
+                    if (element.cityName == self.currentCityRenderableInfo?.cityName) {
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+//                self.cityData()
+
+                var selectedCity = self.cities[indexOfCurrentlySelectedCity ?? 0]
                 selectedCity.dailyWeatherModel = dailyEntries
                 selectedCity.hourlyWeatherModel = hourlyEntries
                 selectedCity.currentTemp = results.current.temp
@@ -182,7 +203,8 @@ class ViewController: UIViewController {
                 selectedCity.hourlyWeatherModel.append(contentsOf: hourlyEntries)
                 selectedCity.dailyWeatherModel.append(contentsOf: dailyEntries)
                 
-                self.cities[index] = selectedCity
+                self.cities[indexOfCurrentlySelectedCity ?? 0] = selectedCity
+                self.currentCityRenderableInfo = selectedCity
                 self.dailyWeatherTableView.reloadData()
                 self.hourlyWeatherCollectionView.reloadData()
                 self.currentWeatherCondtionsForSelectedCity()
@@ -191,8 +213,10 @@ class ViewController: UIViewController {
     }
     
     func currentWeatherCondtionsForSelectedCity() {
-        let city = self.cities[self.picker.selectedRow(inComponent: 0)]
-        let weatherIcon = city.weatherCondition[0].main.lowercased()
+        guard let currentCity = currentCityRenderableInfo else {
+            return
+        }
+        let weatherIcon = currentCity.weatherCondition[0].main.lowercased()
 
         reloadUIViewToClearData()
         currentInfoView.backgroundColor = UIColor(red: 200/255, green: 200/255, blue: 200/255, alpha: 0.3)
@@ -202,7 +226,7 @@ class ViewController: UIViewController {
         
         self.currentConditions.contentMode = .scaleAspectFit
         self.cityImage.contentMode = .scaleToFill
-        self.cityImage.image = city.cityBackgroundImage
+        self.cityImage.image = currentCity.cityBackgroundImage
         
         if weatherIcon.contains("clear") {
             self.currentConditions.image = UIImage(named: "clear")
@@ -224,15 +248,15 @@ class ViewController: UIViewController {
         
         tempLabel.textAlignment = .center
         tempLabel.font = UIFont(name: "Helvetica-Bold", size: 32)
-        tempLabel.text = "\(Int(city.currentTemp))°"
+        tempLabel.text = "\(Int(currentCity.currentTemp))°"
         
         weatherConditionLabel.textAlignment = .center
         weatherConditionLabel.font = UIFont(name: "Helvetica-Bold", size: 22)
-        weatherConditionLabel.text = "\(city.weatherCondition[0].main)"
+        weatherConditionLabel.text = "\(currentCity.weatherCondition[0].main)"
         
         locationLabel.textAlignment = .center
         locationLabel.font = UIFont(name: "Helvetica", size: 22)
-        locationLabel.text = city.cityName
+        locationLabel.text = currentCity.cityName
         
         addBlurryEdgeToLabel(label: weatherConditionLabel)
         addBlurryEdgeToLabel(label: tempLabel)
@@ -271,10 +295,14 @@ extension ViewController:  UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let city = self.cities[self.picker.selectedRow(inComponent: 0)]
+//        let city = self.cities[self.picker.selectedRow(inComponent: 0)]
         let cell = tableView.dequeueReusableCell(withIdentifier: WeatherTableViewCell.identifer, for: indexPath) as! WeatherTableViewCell
-        cell.configureWithModel(with: city.dailyWeatherModel[indexPath.row])
         cell.selectionStyle = .none
+
+        guard let currentCity = currentCityRenderableInfo else {
+            return cell
+        }
+        cell.configureWithModel(with: currentCity.dailyWeatherModel[indexPath.row])
         return cell
     }
 }
@@ -288,16 +316,20 @@ extension ViewController:UICollectionViewDataSource {
         guard self.cities.count > 0 else {
             return 0
         }
-        let city = self.cities[self.picker.selectedRow(inComponent: 0)]
-        return city.hourlyWeatherModel.count
+        guard let currentCity = currentCityRenderableInfo else {
+            return 0
+        }
+        return currentCity.hourlyWeatherModel.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         view.translatesAutoresizingMaskIntoConstraints = false
-
-        let city = self.cities[self.picker.selectedRow(inComponent: 0)]
+ 
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HourlyWeatherCollectionViewCell.identifer, for: indexPath) as! HourlyWeatherCollectionViewCell
-        cell.configureWithModel(with: [city.hourlyWeatherModel[indexPath.item]])
+        guard let currentCity = currentCityRenderableInfo else {
+            return cell
+        }
+        cell.configureWithModel(with: [currentCity.hourlyWeatherModel[indexPath.item]])
         return cell
     }
 }
@@ -347,6 +379,8 @@ extension ViewController: CLLocationManagerDelegate {
                 if let city = placemark.locality { self.cityNameString = city}
                 self.requestWeatherForLocation(long: Int((currentLocation?.coordinate.longitude)!), lat: Int((currentLocation?.coordinate.latitude)!))
                 self.cityData()
+//                currentCityRenderableInfo = cities.first
+                
             }
         })
     }

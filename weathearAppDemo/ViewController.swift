@@ -31,10 +31,11 @@ class ViewController: UIViewController {
     let geoCoder = CLGeocoder()
     let picker: UIPickerView = UIPickerView()
 
+    let defautBackgroundImage = "defaultBackground"
     var currentLocation: CLLocation?
     var cities: [RenderableCityInfo] = []
     var currentCityRenderableInfo:RenderableCityInfo?
-    var cityNameString: String = ""
+    var currentLocationName: String = ""
     var navBarAccessory:UIToolbar = UIToolbar()
     var locationLabel:UILabel = UILabel()
     var weatherConditionLabel:UILabel = UILabel()
@@ -70,7 +71,11 @@ class ViewController: UIViewController {
         let long: Int = Int(currentLocation.coordinate.longitude)
         let lat: Int = Int(currentLocation.coordinate.latitude)
         
-        let currentLocationForecast = RenderableCityInfo(long: long, lat: lat, cityName: WeatherLocalizable.currentLocation.localized(), currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: cityNameString))
+        if !(currentLocationName == "Toronto") {
+            currentLocationName = defautBackgroundImage
+        }
+        
+        let currentLocationForecast = RenderableCityInfo(long: long, lat: lat, cityName: WeatherLocalizable.currentLocation.localized(), currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: currentLocationName))
         let chicagoForecast = RenderableCityInfo(long: Int(-87.623), lat: Int(41.881), cityName: WeatherLocalizable.cityChicago.localized(),  currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityChicago.localized()))
         let londonForecast = RenderableCityInfo(long: Int(-0.118), lat: Int(51.509), cityName:WeatherLocalizable.cityLondon.localized(),  currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityLondon.localized()))
         let tokyoForecast = RenderableCityInfo(long: Int(139.839), lat: Int(35.65), cityName: WeatherLocalizable.cityTokyo.localized(),  currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityTokyo.localized()))
@@ -123,7 +128,7 @@ class ViewController: UIViewController {
             self.requestWeatherForLocation(long: currentCity.long, lat: currentCity.lat)
         }
         
-        self.cityNameString = currentCity.cityName
+        self.currentLocationName = currentCity.cityName
         if indexOfCurrentlySelectedCity == 0 {
             self.locationManager.requestLocation()
             self.locationManager.stopUpdatingLocation()
@@ -374,7 +379,7 @@ extension ViewController: CLLocationManagerDelegate {
         
         geoCoder.reverseGeocodeLocation(currentLocation!, completionHandler: { [self] (placemarks, _) -> Void in
             placemarks?.forEach { (placemark) in
-                if let city = placemark.locality { self.cityNameString = city}
+                if let city = placemark.locality { self.currentLocationName = city}
                 self.requestWeatherForLocation(long: Int((currentLocation?.coordinate.longitude) ?? -79.347), lat: Int((currentLocation?.coordinate.latitude) ?? 43.651))
                 self.cityData()
             }

@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  WeatherMainViewController.swift
 //  weathearAppDemo
 //
 //  Created by Bhavin Kapadia on 2022-05-22.
@@ -19,7 +19,7 @@ struct RenderableCityInfo {
     var cityBackgroundImage: UIImage?
 }
 
-class ViewController: UIViewController {
+class WeatherMainViewController: UIViewController {
     
     @IBOutlet weak var currentInfoView: UIView!
     @IBOutlet var dailyWeatherTableView: UITableView!
@@ -284,7 +284,7 @@ class ViewController: UIViewController {
 }
 
 //MARK: Daily Weather Table View
-extension ViewController:  UITableViewDelegate, UITableViewDataSource {
+extension WeatherMainViewController:  UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         guard self.cities.count > 0 else {
             return 0
@@ -313,10 +313,10 @@ extension ViewController:  UITableViewDelegate, UITableViewDataSource {
 }
 
 //MARK: Hourly Weather Table View
-extension ViewController: UICollectionViewDelegate {
+extension WeatherMainViewController: UICollectionViewDelegate {
 }
 
-extension ViewController:UICollectionViewDataSource {
+extension WeatherMainViewController:UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         guard self.cities.count > 0 else {
             return 0
@@ -340,7 +340,7 @@ extension ViewController:UICollectionViewDataSource {
 }
 
 //MARK: City picker view
-extension ViewController: UIPickerViewDelegate, UIPickerViewDataSource {
+extension WeatherMainViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
     }
@@ -361,7 +361,7 @@ extension ViewController: UIPickerViewDelegate, UIPickerViewDataSource {
 
 
 //MARK: Current Location Manager
-extension ViewController: CLLocationManagerDelegate {
+extension WeatherMainViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         let alert = UIAlertController(title: WeatherLocalizable.error.localized(), message: WeatherLocalizable.locationErrorExpand.localized(), preferredStyle: .alert)
         let ok = UIAlertAction(title: WeatherLocalizable.ok.localized(), style: .default, handler: { action in })

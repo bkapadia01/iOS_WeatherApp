@@ -123,14 +123,8 @@ class ViewController: UIViewController {
     }
     
     @objc func doneButtonTapped() {
-        let indexOfCurrentlySelectedCity = cities.firstIndex { element in
-                   if (element.cityName == currentCityRenderableInfo?.cityName) {
-                       return true
-                   } else {
-                       return false
-                   }
-               }
-        let currentCity = cities[indexOfCurrentlySelectedCity ?? 0]
+        let indexOfCurrentlySelectedCity = picker.selectedRow(inComponent: 0)
+        let currentCity = cities[indexOfCurrentlySelectedCity]
         currentCityRenderableInfo = currentCity
         
         DispatchQueue.main.async {
@@ -290,7 +284,14 @@ extension ViewController:  UITableViewDelegate, UITableViewDataSource {
         guard self.cities.count > 0 else {
             return 0
         }
-        let city = self.cities[self.picker.selectedRow(inComponent: 0)]
+        let indexOfCurrentlySelectedCity = cities.firstIndex { element in
+            if (element.cityName == currentCityRenderableInfo?.cityName) {
+                return true
+            } else {
+                return false
+            }
+        }
+        let city = self.cities[indexOfCurrentlySelectedCity ?? 0]
         return city.dailyWeatherModel.count
     }
     

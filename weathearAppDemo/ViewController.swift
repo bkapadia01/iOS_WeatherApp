@@ -8,7 +8,6 @@
 import UIKit
 import CoreLocation
 
-
 struct RenderableCityInfo {
     var long: Int
     var lat: Int
@@ -271,7 +270,6 @@ class ViewController: UIViewController {
         
         let maskLayer = CAGradientLayer()
         maskLayer.frame = label.bounds
-        maskLayer.shadowRadius = 1
         maskLayer.shadowPath = CGPath(roundedRect: label.bounds.insetBy(dx: 40, dy: -10), cornerWidth: 15, cornerHeight: 5, transform: nil)
         maskLayer.shadowOpacity =  1
         maskLayer.shadowOffset = CGSize.zero

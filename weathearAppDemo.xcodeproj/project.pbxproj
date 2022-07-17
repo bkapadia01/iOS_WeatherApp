@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C3BDFAD228847ED700F774F1 /* WeatherLocalizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C3BDFAD128847ED700F774F1 /* WeatherLocalizable.strings */; };
+		C3BDFAD428847FC700F774F1 /* WeatherLocalizable.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3BDFAD328847FC700F774F1 /* WeatherLocalizable.swift */; };
 		C3CF6C74283AE319008EF211 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3CF6C73283AE319008EF211 /* AppDelegate.swift */; };
 		C3CF6C76283AE319008EF211 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3CF6C75283AE319008EF211 /* SceneDelegate.swift */; };
 		C3CF6C78283AE319008EF211 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3CF6C77283AE319008EF211 /* ViewController.swift */; };
@@ -22,6 +24,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		C3BDFAD128847ED700F774F1 /* WeatherLocalizable.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = WeatherLocalizable.strings; sourceTree = "<group>"; };
+		C3BDFAD328847FC700F774F1 /* WeatherLocalizable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherLocalizable.swift; sourceTree = "<group>"; };
 		C3CF6C70283AE319008EF211 /* weathearAppDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = weathearAppDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C3CF6C73283AE319008EF211 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C3CF6C75283AE319008EF211 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -49,6 +53,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C3BDFAD028847E7C00F774F1 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				C3BDFAD128847ED700F774F1 /* WeatherLocalizable.strings */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		C3CF6C67283AE319008EF211 = {
 			isa = PBXGroup;
 			children = (
@@ -69,9 +81,11 @@
 			isa = PBXGroup;
 			children = (
 				C3CF6C73283AE319008EF211 /* AppDelegate.swift */,
+				C3BDFAD028847E7C00F774F1 /* Resources */,
 				C3D5DA9D28567A82000CD5A1 /* HourlyWeather */,
 				C3CF6C8A283AEA0A008EF211 /* WeatherCell */,
 				C3CF6C75283AE319008EF211 /* SceneDelegate.swift */,
+				C3BDFAD328847FC700F774F1 /* WeatherLocalizable.swift */,
 				C3CF6C77283AE319008EF211 /* ViewController.swift */,
 				C3E7AB6D2846B3DA007EB7A1 /* WeatherAPIResponse.swift */,
 				C3CF6C79283AE319008EF211 /* Main.storyboard */,
@@ -163,6 +177,7 @@
 				C3CF6C90283AEA68008EF211 /* WeatherTableViewCell.xib in Resources */,
 				C3CF6C83283AE31D008EF211 /* LaunchScreen.storyboard in Resources */,
 				C3CF6C80283AE31D008EF211 /* Assets.xcassets in Resources */,
+				C3BDFAD228847ED700F774F1 /* WeatherLocalizable.strings in Resources */,
 				C3CF6C7B283AE319008EF211 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -179,6 +194,7 @@
 				C3D5DAAA28592664000CD5A1 /* HourlyWeatherCollectionViewCell.swift in Sources */,
 				C3CF6C78283AE319008EF211 /* ViewController.swift in Sources */,
 				C3CF6C74283AE319008EF211 /* AppDelegate.swift in Sources */,
+				C3BDFAD428847FC700F774F1 /* WeatherLocalizable.swift in Sources */,
 				C3CF6C76283AE319008EF211 /* SceneDelegate.swift in Sources */,
 				C3CF6C7E283AE319008EF211 /* weathearAppDemo.xcdatamodeld in Sources */,
 			);
@@ -257,6 +273,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = NO;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -312,6 +329,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = NO;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -327,6 +345,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = QY658KY6TF;
@@ -357,6 +376,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = QY658KY6TF;

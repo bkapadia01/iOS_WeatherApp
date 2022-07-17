@@ -1,0 +1,19 @@
+/* 
+  WeatherLocalizable.strings
+  weathearAppDemo
+
+  Created by Bhavin Kapadia on 2022-07-17.
+  
+*/
+
+"currentLocation" = "Current Location";
+"cityChicago" = "Chicago";
+"cityLondon" = "London";
+"cityTokyo" = "Tokyo";
+"citySydney" = "Sydney";
+"cityBerlin" = "Berlin";
+"cancel" = "Cancel";
+"apiError" = "Unable to get data from API";
+"error" = "Error";
+"locationErrorExpand" = "Unable to determine location";
+"ok" = "Confirm";

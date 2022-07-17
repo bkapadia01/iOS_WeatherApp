@@ -35,7 +35,6 @@ class ViewController: UIViewController {
     var currentLocation: CLLocation?
     var cities: [RenderableCityInfo] = []
     var currentCityRenderableInfo:RenderableCityInfo?
-//    var selectedCity = 0
     var cityNameString: String = ""
     var navBarAccessory:UIToolbar = UIToolbar()
     var locationLabel:UILabel = UILabel()
@@ -55,7 +54,6 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-
         dailyWeatherTableView.register(WeatherTableViewCell.nib(), forCellReuseIdentifier: WeatherTableViewCell.identifer)
         dailyWeatherTableView.delegate = self
         dailyWeatherTableView.dataSource = self
@@ -63,13 +61,8 @@ class ViewController: UIViewController {
         hourlyWeatherCollectionView.register(HourlyWeatherCollectionViewCell.nib(), forCellWithReuseIdentifier: HourlyWeatherCollectionViewCell.identifer)
         hourlyWeatherCollectionView.delegate = self
         hourlyWeatherCollectionView.dataSource = self
-        hourlyWeatherCollectionView.layer.borderColor = UIColor.lightGray.cgColor
-        hourlyWeatherCollectionView.layer.borderWidth = 1.0
-        hourlyWeatherCollectionView.layer.cornerRadius = 3.0
-//        currentCityRenderableInfo = cities.first
     }
-    
-    
+
     //MARK: List of city data
     private func cityData() {
         guard let currentLocation = currentLocation else {
@@ -78,12 +71,12 @@ class ViewController: UIViewController {
         let long: Int = Int(currentLocation.coordinate.longitude)
         let lat: Int = Int(currentLocation.coordinate.latitude)
         
-        let currentLocationForecast = RenderableCityInfo(long: long, lat: lat, cityName: "Current Location", currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: cityNameString))
-        let chicagoForecast = RenderableCityInfo(long: Int(-87.623), lat: Int(41.881), cityName: "Chicago",  currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: "Chicago"))
-        let londonForecast = RenderableCityInfo(long: Int(-0.118), lat: Int(51.509), cityName: "London",  currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: "London"))
-        let tokyoForecast = RenderableCityInfo(long: Int(139.839), lat: Int(35.65), cityName: "Tokyo",  currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: "Tokyo"))
-        let sydneyForecast = RenderableCityInfo(long: Int(151.20), lat: Int(-33.86), cityName: "Sydney",  currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: "Sydney"))
-        let berlinForecast = RenderableCityInfo(long: Int(13.404), lat: Int(52.520), cityName: "Berlin",  currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: "Berlin"))
+        let currentLocationForecast = RenderableCityInfo(long: long, lat: lat, cityName: WeatherLocalizable.currentLocation.localized(), currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: cityNameString))
+        let chicagoForecast = RenderableCityInfo(long: Int(-87.623), lat: Int(41.881), cityName: WeatherLocalizable.cityChicago.localized(),  currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityChicago.localized()))
+        let londonForecast = RenderableCityInfo(long: Int(-0.118), lat: Int(51.509), cityName:WeatherLocalizable.cityLondon.localized(),  currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityLondon.localized()))
+        let tokyoForecast = RenderableCityInfo(long: Int(139.839), lat: Int(35.65), cityName: WeatherLocalizable.cityTokyo.localized(),  currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityTokyo.localized()))
+        let sydneyForecast = RenderableCityInfo(long: Int(151.20), lat: Int(-33.86), cityName: WeatherLocalizable.citySydney.localized(),  currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.citySydney.localized()))
+        let berlinForecast = RenderableCityInfo(long: Int(13.404), lat: Int(52.520), cityName: WeatherLocalizable.cityBerlin.localized(),  currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityBerlin.localized()))
         
         cities = [currentLocationForecast,chicagoForecast,londonForecast,tokyoForecast,sydneyForecast,berlinForecast]
     }
@@ -109,16 +102,16 @@ class ViewController: UIViewController {
         self.view.addSubview(picker)
         picker.center = self.view.center
         
-        // Toolbar
+        // NavBar options
         let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(self.doneButtonTapped))
-        let spaceButton = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        let cancelButton = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(self.canceButtonTapped))
+        let navBarSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        let cancelButton = UIBarButtonItem(title: WeatherLocalizable.cancel.localized(), style: .plain, target: self, action: #selector(self.canceButtonTapped))
         
         navBarAccessory = UIToolbar(frame: CGRect(x: 0, y: 0, width: picker.frame.width, height: 70))
         navBarAccessory.barStyle = .default
         navBarAccessory.isTranslucent = false
         navBarAccessory.isUserInteractionEnabled = true
-        navBarAccessory.items = [cancelButton, spaceButton, doneButton]
+        navBarAccessory.items = [cancelButton, navBarSpace, doneButton]
         self.view.addSubview (navBarAccessory)
     }
     
@@ -154,13 +147,13 @@ class ViewController: UIViewController {
     }
     
     func requestWeatherForLocation(long: Int, lat: Int) {
-        let url = "https://api.openweathermap.org/data/2.5/onecall?lat=\(lat)&lon=\(long)&exclude=minutely,alerts&units=metric&appid=f1266e7ef11b56cc3e6f353b3bb2c635"
+        let url = URL(string: "https://api.openweathermap.org/data/2.5/onecall?lat=\(lat)&lon=\(long)&exclude=minutely,alerts&units=metric&appid=f1266e7ef11b56cc3e6f353b3bb2c635")!
         
-        URLSession.shared.dataTask(with: URL(string: url)!, completionHandler: {data, response, error in
+         let task = URLSession.shared.dataTask(with: url, completionHandler: {data, response, error in
             
             // Validation
             guard let data = data, error == nil else {
-                print("Unable to get data from API")
+                print(WeatherLocalizable.apiError.localized())
                 return
             }
             
@@ -169,7 +162,12 @@ class ViewController: UIViewController {
             do {
                 json = try JSONDecoder().decode(WeatherResponse.self, from: data)
             } catch {
-                print("Error: \(error)")
+                let alert = UIAlertController(title: WeatherLocalizable.error.localized(), message: "\(error)", preferredStyle: .alert)
+                let ok = UIAlertAction(title: WeatherLocalizable.ok.localized(), style: .default, handler: { action in })
+                alert.addAction(ok)
+                DispatchQueue.main.async(execute: {
+                    self.present(alert, animated: true)
+                })
             }
             
             guard let results = json else {
@@ -187,8 +185,7 @@ class ViewController: UIViewController {
                         return false
                     }
                 }
-//                self.cityData()
-
+                
                 var selectedCity = self.cities[indexOfCurrentlySelectedCity ?? 0]
                 selectedCity.dailyWeatherModel = dailyEntries
                 selectedCity.hourlyWeatherModel = hourlyEntries
@@ -203,14 +200,15 @@ class ViewController: UIViewController {
                 self.hourlyWeatherCollectionView.reloadData()
                 self.currentWeatherCondtionsForSelectedCity()
             }
-        }).resume()
+        })
+        task.resume()
     }
     
     func currentWeatherCondtionsForSelectedCity() {
-        guard let currentCity = currentCityRenderableInfo else {
+        guard let currentSelectedCity = currentCityRenderableInfo else {
             return
         }
-        let weatherIcon = currentCity.weatherCondition[0].main.lowercased()
+        let weatherIcon = currentSelectedCity.weatherCondition[0].main.lowercased()
 
         reloadUIViewToClearData()
         currentInfoView.backgroundColor = UIColor(red: 200/255, green: 200/255, blue: 200/255, alpha: 0.3)
@@ -220,7 +218,7 @@ class ViewController: UIViewController {
         
         self.currentConditions.contentMode = .scaleAspectFit
         self.cityImage.contentMode = .scaleToFill
-        self.cityImage.image = currentCity.cityBackgroundImage
+        self.cityImage.image = currentSelectedCity.cityBackgroundImage
         
         if weatherIcon.contains("clear") {
             self.currentConditions.image = UIImage(named: "clear")
@@ -242,19 +240,23 @@ class ViewController: UIViewController {
         
         tempLabel.textAlignment = .center
         tempLabel.font = UIFont(name: "Helvetica-Bold", size: 32)
-        tempLabel.text = "\(Int(currentCity.currentTemp))°"
+        tempLabel.text = "\(Int(currentSelectedCity.currentTemp))°"
         
         weatherConditionLabel.textAlignment = .center
         weatherConditionLabel.font = UIFont(name: "Helvetica-Bold", size: 22)
-        weatherConditionLabel.text = "\(currentCity.weatherCondition[0].main)"
+        weatherConditionLabel.text = "\(currentSelectedCity.weatherCondition[0].main)"
         
         locationLabel.textAlignment = .center
         locationLabel.font = UIFont(name: "Helvetica", size: 22)
-        locationLabel.text = currentCity.cityName
+        locationLabel.text = currentSelectedCity.cityName
         
-        addBlurryEdgeToLabel(label: weatherConditionLabel)
-        addBlurryEdgeToLabel(label: tempLabel)
-        addBlurryEdgeToLabel(label: locationLabel)
+        addGreyBackgroundToLabel(label: weatherConditionLabel)
+        addGreyBackgroundToLabel(label: tempLabel)
+        addGreyBackgroundToLabel(label: locationLabel)
+        
+        hourlyWeatherCollectionView.layer.borderColor = UIColor.lightGray.cgColor
+        hourlyWeatherCollectionView.layer.borderWidth = 1.0
+        hourlyWeatherCollectionView.layer.cornerRadius = 3.0
     }
     
     func reloadUIViewToClearData() {
@@ -264,7 +266,7 @@ class ViewController: UIViewController {
         parent?.addSubview(self.view)
     }
     
-    func addBlurryEdgeToLabel(label: UILabel) {
+    func addGreyBackgroundToLabel(label: UILabel) {
         label.backgroundColor = UIColor.gray.withAlphaComponent(0.3)
         
         let maskLayer = CAGradientLayer()
@@ -296,7 +298,6 @@ extension ViewController:  UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//        let city = self.cities[self.picker.selectedRow(inComponent: 0)]
         let cell = tableView.dequeueReusableCell(withIdentifier: WeatherTableViewCell.identifer, for: indexPath) as! WeatherTableViewCell
         cell.selectionStyle = .none
 
@@ -359,13 +360,11 @@ extension ViewController: UIPickerViewDelegate, UIPickerViewDataSource {
 //MARK: Current Location Manager
 extension ViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        let alert = UIAlertController(title: "Location Error", message: "Unable to determine location", preferredStyle: .alert)
-            
-             let ok = UIAlertAction(title: "OK", style: .default, handler: { action in
-             })
-             alert.addAction(ok)
-             DispatchQueue.main.async(execute: {
-                self.present(alert, animated: true)
+        let alert = UIAlertController(title: WeatherLocalizable.error.localized(), message: WeatherLocalizable.locationErrorExpand.localized(), preferredStyle: .alert)
+        let ok = UIAlertAction(title: WeatherLocalizable.ok.localized(), style: .default, handler: { action in })
+        alert.addAction(ok)
+        DispatchQueue.main.async(execute: {
+            self.present(alert, animated: true)
         })
     }
     
@@ -378,11 +377,17 @@ extension ViewController: CLLocationManagerDelegate {
         geoCoder.reverseGeocodeLocation(currentLocation!, completionHandler: { [self] (placemarks, _) -> Void in
             placemarks?.forEach { (placemark) in
                 if let city = placemark.locality { self.cityNameString = city}
-                self.requestWeatherForLocation(long: Int((currentLocation?.coordinate.longitude)!), lat: Int((currentLocation?.coordinate.latitude)!))
+                self.requestWeatherForLocation(long: Int((currentLocation?.coordinate.longitude) ?? -79.347), lat: Int((currentLocation?.coordinate.latitude) ?? 43.651))
                 self.cityData()
-//                currentCityRenderableInfo = cities.first
-                
             }
         })
+    }
+}
+
+extension String {
+    func localized() -> String{
+        var fileName = String()
+        fileName = "WeatherLocalizable"
+        return NSLocalizedString(self, tableName: fileName, bundle: Bundle.main, value: String(), comment: String())
     }
 }

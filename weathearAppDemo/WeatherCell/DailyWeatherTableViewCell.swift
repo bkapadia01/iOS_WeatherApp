@@ -1,5 +1,5 @@
 //
-//  WeatherTableViewCell.swift
+//  DailyWeatherTableViewCell.swift
 //  weathearAppDemo
 //
 //  Created by Bhavin Kapadia on 2022-05-22.
@@ -7,7 +7,7 @@
 import Foundation
 import UIKit
 
-class WeatherTableViewCell: UITableViewCell {
+class DailyWeatherTableViewCell: UITableViewCell {
     @IBOutlet var dayLabel: UILabel!
     @IBOutlet var highTempLabel: UILabel!
     @IBOutlet var lowTempLabel: UILabel!

@@ -54,7 +54,7 @@ class WeatherMainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        dailyWeatherTableView.register(WeatherTableViewCell.nib(), forCellReuseIdentifier: WeatherTableViewCell.identifer)
+        dailyWeatherTableView.register(DailyWeatherTableViewCell.nib(), forCellReuseIdentifier: DailyWeatherTableViewCell.identifer)
         dailyWeatherTableView.delegate = self
         dailyWeatherTableView.dataSource = self
         
@@ -191,8 +191,6 @@ class WeatherMainViewController: UIViewController {
                 }
                 
                 var selectedCity = self.cities[indexOfCurrentlySelectedCity ?? 0]
-                selectedCity.dailyWeatherModel = dailyEntries
-                selectedCity.hourlyWeatherModel = hourlyEntries
                 selectedCity.currentTemp = results.current.temp
                 selectedCity.weatherCondition = results.current.weather
                 selectedCity.hourlyWeatherModel.append(contentsOf: hourlyEntries)
@@ -301,7 +299,7 @@ extension WeatherMainViewController:  UITableViewDelegate, UITableViewDataSource
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: WeatherTableViewCell.identifer, for: indexPath) as! WeatherTableViewCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: DailyWeatherTableViewCell.identifer, for: indexPath) as! DailyWeatherTableViewCell
         cell.selectionStyle = .none
 
         guard let currentCity = currentCityRenderableInfo else {

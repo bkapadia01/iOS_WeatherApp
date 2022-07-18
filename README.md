@@ -16,3 +16,4 @@ PickerView - selection of cities to select from including current location(defau
 ### Possible Future Enhancements:
 - To separate the picker view into a separate view controller and pass information back to the main view controller instead of using pickerView only, this helps to reduce code dependency between picker view and displaying the forecast of the selected city
 - Ability to search for a city
+- Ability to change language

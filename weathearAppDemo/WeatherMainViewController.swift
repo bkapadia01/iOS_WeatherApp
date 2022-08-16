@@ -7,9 +7,9 @@
 
 import UIKit
 import CoreLocation
-
+// group this (MARK) with like items and take common MARKED items into their own class -> gives blueprint of modularizing things
 struct RenderableCityInfo {
-    var long: Int
+    var long: Int // dont use short form espeically if it's a data type -> what type long is this, it can mean anything
     var lat: Int
     var cityName:String
     var currentTemp: Double
@@ -29,7 +29,7 @@ class WeatherMainViewController: UIViewController {
     
     let locationManager  = CLLocationManager()
     let geoCoder = CLGeocoder()
-    let picker: UIPickerView = UIPickerView()
+    let picker: UIPickerView = UIPickerView() // same with this -> which picker, think of how others are reading, be more obvious with the naming!!!
 
     let defautBackgroundImage = "defaultBackground"
     var currentLocation: CLLocation?
@@ -42,12 +42,14 @@ class WeatherMainViewController: UIViewController {
     var tempLabel:UILabel = UILabel()
     
     override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(false)
+        super.viewWillAppear(animated)
         DispatchQueue.main.async {
             self.retrieveLocationOnAppStartup()
         }
         
         // Moved search/nav bar here since there was a UI issue if you tapped on search/done repeatedly very quickly
+        // move this back to orignial positon and see if it can be handled where it should be - understand this issue better!!!
+        // 2 tricks from apple  can help with UI debugging - debug view hiearchy and slow animation
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(cityPickerController))
     }
     
@@ -75,6 +77,8 @@ class WeatherMainViewController: UIViewController {
             currentLocationName = defautBackgroundImage
         }
         
+        
+        
         let currentLocationForecast = RenderableCityInfo(long: long, lat: lat, cityName: WeatherLocalizable.currentLocation.localized(), currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: currentLocationName))
         let chicagoForecast = RenderableCityInfo(long: Int(-87.623), lat: Int(41.881), cityName: WeatherLocalizable.cityChicago.localized(),  currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityChicago.localized()))
         let londonForecast = RenderableCityInfo(long: Int(-0.118), lat: Int(51.509), cityName:WeatherLocalizable.cityLondon.localized(),  currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityLondon.localized()))
@@ -82,12 +86,18 @@ class WeatherMainViewController: UIViewController {
         let sydneyForecast = RenderableCityInfo(long: Int(151.20), lat: Int(-33.86), cityName: WeatherLocalizable.citySydney.localized(),  currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.citySydney.localized()))
         let berlinForecast = RenderableCityInfo(long: Int(13.404), lat: Int(52.520), cityName: WeatherLocalizable.cityBerlin.localized(),  currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityBerlin.localized()))
         
+        // instead of emty hourly and daily weaather model arrays - we can do a city picker objec tthat only has names - long/lat for the city - everything with empty array would be another object...each vc represents a screen and respective model with each view, so home would have different model than the picker model
+            // so main page only renders only the model for the city selected
+        // limit the size of class to just do 1 thing only
+            // MVVM allows to use a template to break up the logic into logical parts
+            // break 1 class into 2 -> grouping functions in the logic portion -> retriving data can be a service that can be another class - so now the view model is split into 2 now
+        //
         cities = [currentLocationForecast,chicagoForecast,londonForecast,tokyoForecast,sydneyForecast,berlinForecast]
     }
     
     //MARK: City picker view with selection of cities and navigation bar
     @objc func cityPickerController() {
-        navigationController?.setNavigationBarHidden(true, animated: false)
+        navigationController?.setNavigationBarHidden(true, animated: true)
         
         picker.frame = CGRect(x: 0, y: 200, width: view.frame.width, height: view.frame.height)
         picker.autoresizingMask = .flexibleHeight
@@ -152,6 +162,9 @@ class WeatherMainViewController: UIViewController {
     
     func requestWeatherForLocation(long: Int, lat: Int) {
         let url = URL(string: "https://api.openweathermap.org/data/2.5/onecall?lat=\(lat)&lon=\(long)&exclude=minutely,alerts&units=metric&appid=f1266e7ef11b56cc3e6f353b3bb2c635")!
+        // api calling helper/service should make call and this is only job it should do and not do any parsing/UI related tasks - tell me endpoint and get the raw data for me
+            // all the UI should only be handled by the VC and the parsing of the data should shoould be handled by view model as well the calling of api
+        // business logic = view model
         
          let task = URLSession.shared.dataTask(with: url, completionHandler: {data, response, error in
             

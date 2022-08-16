@@ -4,6 +4,8 @@
 //
 //  Created by Bhavin Kapadia on 2022-05-31.
 //
+// passing this by value vs passing by reference...when you write a renderer (ui view controller), always start with struct - pass by value when possible rather than object....passing by ref is conveinient but also very dangerous that can cause the data to be changed when you dont want it to be changed
+
 
 import Foundation
  

@@ -18,4 +18,5 @@ PickerView - selection of cities to select from including current location(defau
 - Refactor how the cities long/lat are hardcoded and code is repeated for each city
 - Ability to search for a city
 - Ability to change language
+- Use MVVM framework
 

@@ -9,10 +9,10 @@ import UIKit
 import CoreLocation
 // group this (MARK) with like items and take common MARKED items into their own class -> gives blueprint of modularizing things
 struct RenderableCityInfo {
-    var long: Int // dont use short form espeically if it's a data type -> what type long is this, it can mean anything
-    var lat: Int
+    var cityLongitude: Int // dont use short form espeically if it's a data type -> what type long is this, it can mean anything
+    var cityLatitude: Int
     var cityName:String
-    var currentTemp: Double
+    var currentTemperature: Double
     var weatherCondition: [Weather]
     var dailyWeatherModel:[Daily]
     var hourlyWeatherModel:[Current]
@@ -29,17 +29,17 @@ class WeatherMainViewController: UIViewController {
     
     let locationManager  = CLLocationManager()
     let geoCoder = CLGeocoder()
-    let picker: UIPickerView = UIPickerView() // same with this -> which picker, think of how others are reading, be more obvious with the naming!!!
+    let cityPickerView: UIPickerView = UIPickerView() // same with this -> which picker, think of how others are reading, be more obvious with the naming!!!
 
     let defautBackgroundImage = "defaultBackground"
     var currentLocation: CLLocation?
-    var cities: [RenderableCityInfo] = []
+    var citiesWeatherModel: [RenderableCityInfo] = []
     var currentCityRenderableInfo:RenderableCityInfo?
     var currentLocationName: String = ""
     var navBarAccessory:UIToolbar = UIToolbar()
     var locationLabel:UILabel = UILabel()
     var weatherConditionLabel:UILabel = UILabel()
-    var tempLabel:UILabel = UILabel()
+    var currentTemperatureLabel:UILabel = UILabel()
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -79,12 +79,12 @@ class WeatherMainViewController: UIViewController {
         
         
         
-        let currentLocationForecast = RenderableCityInfo(long: long, lat: lat, cityName: WeatherLocalizable.currentLocation.localized(), currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: currentLocationName))
-        let chicagoForecast = RenderableCityInfo(long: Int(-87.623), lat: Int(41.881), cityName: WeatherLocalizable.cityChicago.localized(),  currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityChicago.localized()))
-        let londonForecast = RenderableCityInfo(long: Int(-0.118), lat: Int(51.509), cityName:WeatherLocalizable.cityLondon.localized(),  currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityLondon.localized()))
-        let tokyoForecast = RenderableCityInfo(long: Int(139.839), lat: Int(35.65), cityName: WeatherLocalizable.cityTokyo.localized(),  currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityTokyo.localized()))
-        let sydneyForecast = RenderableCityInfo(long: Int(151.20), lat: Int(-33.86), cityName: WeatherLocalizable.citySydney.localized(),  currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.citySydney.localized()))
-        let berlinForecast = RenderableCityInfo(long: Int(13.404), lat: Int(52.520), cityName: WeatherLocalizable.cityBerlin.localized(),  currentTemp: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityBerlin.localized()))
+        let currentLocationForecast = RenderableCityInfo(cityLongitude: long, cityLatitude: lat, cityName: WeatherLocalizable.currentLocation.localized(), currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: currentLocationName))
+        let chicagoForecast = RenderableCityInfo(cityLongitude: Int(-87.623), cityLatitude: Int(41.881), cityName: WeatherLocalizable.cityChicago.localized(),  currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityChicago.localized()))
+        let londonForecast = RenderableCityInfo(cityLongitude: Int(-0.118), cityLatitude: Int(51.509), cityName:WeatherLocalizable.cityLondon.localized(),  currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityLondon.localized()))
+        let tokyoForecast = RenderableCityInfo(cityLongitude: Int(139.839), cityLatitude: Int(35.65), cityName: WeatherLocalizable.cityTokyo.localized(),  currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityTokyo.localized()))
+        let sydneyForecast = RenderableCityInfo(cityLongitude: Int(151.20), cityLatitude: Int(-33.86), cityName: WeatherLocalizable.citySydney.localized(),  currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.citySydney.localized()))
+        let berlinForecast = RenderableCityInfo(cityLongitude: Int(13.404), cityLatitude: Int(52.520), cityName: WeatherLocalizable.cityBerlin.localized(),  currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityBerlin.localized()))
         
         // instead of emty hourly and daily weaather model arrays - we can do a city picker objec tthat only has names - long/lat for the city - everything with empty array would be another object...each vc represents a screen and respective model with each view, so home would have different model than the picker model
             // so main page only renders only the model for the city selected
@@ -92,36 +92,36 @@ class WeatherMainViewController: UIViewController {
             // MVVM allows to use a template to break up the logic into logical parts
             // break 1 class into 2 -> grouping functions in the logic portion -> retriving data can be a service that can be another class - so now the view model is split into 2 now
         //
-        cities = [currentLocationForecast,chicagoForecast,londonForecast,tokyoForecast,sydneyForecast,berlinForecast]
+        citiesWeatherModel = [currentLocationForecast,chicagoForecast,londonForecast,tokyoForecast,sydneyForecast,berlinForecast]
     }
     
     //MARK: City picker view with selection of cities and navigation bar
     @objc func cityPickerController() {
         navigationController?.setNavigationBarHidden(true, animated: true)
         
-        picker.frame = CGRect(x: 0, y: 200, width: view.frame.width, height: view.frame.height)
-        picker.autoresizingMask = .flexibleHeight
-        picker.backgroundColor = .init(white: 0.9, alpha: 0.9)
-        picker.delegate = self
-        picker.dataSource = self
-        picker.isHidden = false
-        let indexOfCurrentlySelectedCity = cities.firstIndex { element in
+        cityPickerView.frame = CGRect(x: 0, y: 200, width: view.frame.width, height: view.frame.height)
+        cityPickerView.autoresizingMask = .flexibleHeight
+        cityPickerView.backgroundColor = .init(white: 0.9, alpha: 0.9)
+        cityPickerView.delegate = self
+        cityPickerView.dataSource = self
+        cityPickerView.isHidden = false
+        let indexOfCurrentlySelectedCity = citiesWeatherModel.firstIndex { element in
             if (element.cityName == currentCityRenderableInfo?.cityName) {
                 return true
             } else {
                 return false
             }
         }
-        picker.selectRow(indexOfCurrentlySelectedCity ?? 0, inComponent: 0, animated: false)
-        self.view.addSubview(picker)
-        picker.center = self.view.center
+        cityPickerView.selectRow(indexOfCurrentlySelectedCity ?? 0, inComponent: 0, animated: false)
+        self.view.addSubview(cityPickerView)
+        cityPickerView.center = self.view.center
         
         // NavBar options
         let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(self.doneButtonTapped))
         let navBarSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         let cancelButton = UIBarButtonItem(title: WeatherLocalizable.cancel.localized(), style: .plain, target: self, action: #selector(self.canceButtonTapped))
         
-        navBarAccessory = UIToolbar(frame: CGRect(x: 0, y: 0, width: picker.frame.width, height: 70))
+        navBarAccessory = UIToolbar(frame: CGRect(x: 0, y: 0, width: cityPickerView.frame.width, height: 70))
         navBarAccessory.barStyle = .default
         navBarAccessory.isTranslucent = false
         navBarAccessory.isUserInteractionEnabled = true
@@ -130,12 +130,12 @@ class WeatherMainViewController: UIViewController {
     }
     
     @objc func doneButtonTapped() {
-        let indexOfCurrentlySelectedCity = picker.selectedRow(inComponent: 0)
-        let currentCity = cities[indexOfCurrentlySelectedCity]
+        let indexOfCurrentlySelectedCity = cityPickerView.selectedRow(inComponent: 0)
+        let currentCity = citiesWeatherModel[indexOfCurrentlySelectedCity]
         currentCityRenderableInfo = currentCity
         
         DispatchQueue.main.async {
-            self.requestWeatherForLocation(long: currentCity.long, lat: currentCity.lat)
+            self.requestWeatherForLocation(long: currentCity.cityLongitude, lat: currentCity.cityLatitude)
         }
         
         self.currentLocationName = currentCity.cityName
@@ -143,13 +143,13 @@ class WeatherMainViewController: UIViewController {
             self.locationManager.requestLocation()
             self.locationManager.stopUpdatingLocation()
         }
-        picker.isHidden = true
+        cityPickerView.isHidden = true
         navBarAccessory.isHidden = true
         self.navigationController?.isNavigationBarHidden = false
     }
     
     @objc func canceButtonTapped() {
-        picker.isHidden = true
+        cityPickerView.isHidden = true
         navBarAccessory.isHidden = true
         self.navigationController?.isNavigationBarHidden = false
     }
@@ -195,7 +195,7 @@ class WeatherMainViewController: UIViewController {
             let hourlyEntries =  Array(results.hourly[1...12])
             
             DispatchQueue.main.async {
-                let indexOfCurrentlySelectedCity = self.cities.firstIndex { element in
+                let indexOfCurrentlySelectedCity = self.citiesWeatherModel.firstIndex { element in
                     if (element.cityName == self.currentCityRenderableInfo?.cityName) {
                         return true
                     } else {
@@ -203,13 +203,13 @@ class WeatherMainViewController: UIViewController {
                     }
                 }
                 
-                var selectedCity = self.cities[indexOfCurrentlySelectedCity ?? 0]
-                selectedCity.currentTemp = results.current.temp
+                var selectedCity = self.citiesWeatherModel[indexOfCurrentlySelectedCity ?? 0]
+                selectedCity.currentTemperature = results.current.temp
                 selectedCity.weatherCondition = results.current.weather
                 selectedCity.hourlyWeatherModel.append(contentsOf: hourlyEntries)
                 selectedCity.dailyWeatherModel.append(contentsOf: dailyEntries)
                 
-                self.cities[indexOfCurrentlySelectedCity ?? 0] = selectedCity
+                self.citiesWeatherModel[indexOfCurrentlySelectedCity ?? 0] = selectedCity
                 self.currentCityRenderableInfo = selectedCity
                 self.dailyWeatherTableView.reloadData()
                 self.hourlyWeatherCollectionView.reloadData()
@@ -229,7 +229,7 @@ class WeatherMainViewController: UIViewController {
         currentInfoView.backgroundColor = UIColor(red: 200/255, green: 200/255, blue: 200/255, alpha: 0.3)
         locationLabel =  UILabel(frame: CGRect(x: 15, y: 60, width: view.frame.size.width - 20, height: currentInfoView.frame.size.height/5))
         weatherConditionLabel = UILabel(frame: CGRect(x: 15, y: 60 + locationLabel.frame.size.height, width: view.frame.size.width - 20, height: currentInfoView.frame.size.height/15))
-        tempLabel = UILabel(frame: CGRect(x: 15, y: 60 + weatherConditionLabel.frame.size.height + locationLabel.frame.size.height, width: view.frame.size.width - 20, height: currentInfoView.frame.size.height/10))
+        currentTemperatureLabel = UILabel(frame: CGRect(x: 15, y: 60 + weatherConditionLabel.frame.size.height + locationLabel.frame.size.height, width: view.frame.size.width - 20, height: currentInfoView.frame.size.height/10))
         
         self.currentConditions.contentMode = .scaleAspectFit
         self.cityImage.contentMode = .scaleToFill
@@ -251,11 +251,11 @@ class WeatherMainViewController: UIViewController {
     
         currentInfoView.addSubview(locationLabel)
         currentInfoView.addSubview(weatherConditionLabel)
-        currentInfoView.addSubview(tempLabel)
+        currentInfoView.addSubview(currentTemperatureLabel)
         
-        tempLabel.textAlignment = .center
-        tempLabel.font = UIFont(name: "Helvetica-Bold", size: 32)
-        tempLabel.text = "\(Int(currentSelectedCity.currentTemp))°"
+        currentTemperatureLabel.textAlignment = .center
+        currentTemperatureLabel.font = UIFont(name: "Helvetica-Bold", size: 32)
+        currentTemperatureLabel.text = "\(Int(currentSelectedCity.currentTemperature))°"
         
         weatherConditionLabel.textAlignment = .center
         weatherConditionLabel.font = UIFont(name: "Helvetica-Bold", size: 22)
@@ -266,7 +266,7 @@ class WeatherMainViewController: UIViewController {
         locationLabel.text = currentSelectedCity.cityName
         
         addGreyBackgroundToLabel(label: weatherConditionLabel)
-        addGreyBackgroundToLabel(label: tempLabel)
+        addGreyBackgroundToLabel(label: currentTemperatureLabel)
         addGreyBackgroundToLabel(label: locationLabel)
         
         hourlyWeatherCollectionView.layer.borderColor = UIColor.lightGray.cgColor
@@ -297,17 +297,17 @@ class WeatherMainViewController: UIViewController {
 //MARK: Daily Weather Table View
 extension WeatherMainViewController:  UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        guard self.cities.count > 0 else {
+        guard self.citiesWeatherModel.count > 0 else {
             return 0
         }
-        let indexOfCurrentlySelectedCity = cities.firstIndex { element in
+        let indexOfCurrentlySelectedCity = citiesWeatherModel.firstIndex { element in
             if (element.cityName == currentCityRenderableInfo?.cityName) {
                 return true
             } else {
                 return false
             }
         }
-        let city = self.cities[indexOfCurrentlySelectedCity ?? 0]
+        let city = self.citiesWeatherModel[indexOfCurrentlySelectedCity ?? 0]
         return city.dailyWeatherModel.count
     }
     
@@ -329,7 +329,7 @@ extension WeatherMainViewController: UICollectionViewDelegate {
 
 extension WeatherMainViewController:UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        guard self.cities.count > 0 else {
+        guard self.citiesWeatherModel.count > 0 else {
             return 0
         }
         guard let currentCity = currentCityRenderableInfo else {
@@ -357,11 +357,11 @@ extension WeatherMainViewController: UIPickerViewDelegate, UIPickerViewDataSourc
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return cities.count
+        return citiesWeatherModel.count
     }
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        let city = cities[row]
+        let city = citiesWeatherModel[row]
         return city.cityName
     }
     

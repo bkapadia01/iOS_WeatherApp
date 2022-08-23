@@ -9,7 +9,7 @@ import UIKit
 import CoreLocation
 // group this (MARK) with like items and take common MARKED items into their own class -> gives blueprint of modularizing things
 struct RenderableCityInfo {
-    var cityLongitude: Int // dont use short form espeically if it's a data type -> what type long is this, it can mean anything
+    var cityLongitude: Int
     var cityLatitude: Int
     var cityName:String
     var currentTemperature: Double
@@ -29,7 +29,7 @@ class WeatherMainViewController: UIViewController {
     
     let locationManager  = CLLocationManager()
     let geoCoder = CLGeocoder()
-    let cityPickerView: UIPickerView = UIPickerView() // same with this -> which picker, think of how others are reading, be more obvious with the naming!!!
+    let cityPickerView: UIPickerView = UIPickerView()
 
     let defautBackgroundImage = "defaultBackground"
     var currentLocation: CLLocation?

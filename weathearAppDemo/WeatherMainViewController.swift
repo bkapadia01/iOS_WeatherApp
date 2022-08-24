@@ -9,8 +9,8 @@ import UIKit
 import CoreLocation
 // group this (MARK) with like items and take common MARKED items into their own class -> gives blueprint of modularizing things
 struct RenderableCityInfo {
-    var cityLongitude: Int
-    var cityLatitude: Int
+    var cityLongitude: Double
+    var cityLatitude: Double
     var cityName:String
     var currentTemperature: Double
     var weatherCondition: [Weather]
@@ -70,21 +70,19 @@ class WeatherMainViewController: UIViewController {
         guard let currentLocation = currentLocation else {
             return
         }
-        let long: Int = Int(currentLocation.coordinate.longitude)
-        let lat: Int = Int(currentLocation.coordinate.latitude)
+        let cityLongitude: Double = currentLocation.coordinate.longitude
+        let cityLatitude: Double = currentLocation.coordinate.latitude
         
         if !(currentLocationName == "Toronto") {
             currentLocationName = defautBackgroundImage
         }
-        
-        
-        
-        let currentLocationForecast = RenderableCityInfo(cityLongitude: long, cityLatitude: lat, cityName: WeatherLocalizable.currentLocation.localized(), currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: currentLocationName))
-        let chicagoForecast = RenderableCityInfo(cityLongitude: Int(-87.623), cityLatitude: Int(41.881), cityName: WeatherLocalizable.cityChicago.localized(),  currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityChicago.localized()))
-        let londonForecast = RenderableCityInfo(cityLongitude: Int(-0.118), cityLatitude: Int(51.509), cityName:WeatherLocalizable.cityLondon.localized(),  currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityLondon.localized()))
-        let tokyoForecast = RenderableCityInfo(cityLongitude: Int(139.839), cityLatitude: Int(35.65), cityName: WeatherLocalizable.cityTokyo.localized(),  currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityTokyo.localized()))
-        let sydneyForecast = RenderableCityInfo(cityLongitude: Int(151.20), cityLatitude: Int(-33.86), cityName: WeatherLocalizable.citySydney.localized(),  currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.citySydney.localized()))
-        let berlinForecast = RenderableCityInfo(cityLongitude: Int(13.404), cityLatitude: Int(52.520), cityName: WeatherLocalizable.cityBerlin.localized(),  currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityBerlin.localized()))
+                
+        let currentLocationForecast = RenderableCityInfo(cityLongitude: cityLongitude, cityLatitude: cityLatitude, cityName: WeatherLocalizable.currentLocation.localized(), currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: currentLocationName))
+        let chicagoForecast = RenderableCityInfo(cityLongitude: -87.623, cityLatitude: 41.881, cityName: WeatherLocalizable.cityChicago.localized(),  currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityChicago.localized()))
+        let londonForecast = RenderableCityInfo(cityLongitude: -0.118, cityLatitude: 51.509, cityName:WeatherLocalizable.cityLondon.localized(),  currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityLondon.localized()))
+        let tokyoForecast = RenderableCityInfo(cityLongitude: 139.839, cityLatitude: 35.65, cityName: WeatherLocalizable.cityTokyo.localized(),  currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityTokyo.localized()))
+        let sydneyForecast = RenderableCityInfo(cityLongitude: 151.20, cityLatitude: -33.86, cityName: WeatherLocalizable.citySydney.localized(),  currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.citySydney.localized()))
+        let berlinForecast = RenderableCityInfo(cityLongitude: 13.404, cityLatitude: 52.520, cityName: WeatherLocalizable.cityBerlin.localized(),  currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityBerlin.localized()))
         
         // instead of emty hourly and daily weaather model arrays - we can do a city picker objec tthat only has names - long/lat for the city - everything with empty array would be another object...each vc represents a screen and respective model with each view, so home would have different model than the picker model
             // so main page only renders only the model for the city selected
@@ -391,7 +389,8 @@ extension WeatherMainViewController: CLLocationManagerDelegate {
         geoCoder.reverseGeocodeLocation(currentLocation!, completionHandler: { [self] (placemarks, _) -> Void in
             placemarks?.forEach { (placemark) in
                 if let city = placemark.locality { self.currentLocationName = city}
-                self.requestWeatherForLocation(long: Int((currentLocation?.coordinate.longitude) ?? -79.347), lat: Int((currentLocation?.coordinate.latitude) ?? 43.651))
+                
+                self.requestWeatherForLocation(cityLongitude: (currentLocation?.coordinate.longitude) ?? -79.347, cityLatitude: (currentLocation?.coordinate.latitude) ?? 43.651)
                 self.cityData()
             }
         })

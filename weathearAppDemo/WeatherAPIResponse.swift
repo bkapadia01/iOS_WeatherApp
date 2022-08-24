@@ -11,8 +11,8 @@ import Foundation
  
 // MARK: - WeatherResponse
 struct WeatherResponse: Codable {
-    var lat: Int?
-    var lon: Int?
+    var lat: Double?
+    var lon: Double?
     var timezone: String?
     var timezoneOffset: Int?
     var current: Current

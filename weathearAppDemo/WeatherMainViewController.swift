@@ -133,7 +133,7 @@ class WeatherMainViewController: UIViewController {
         currentCityRenderableInfo = currentCity
         
         DispatchQueue.main.async {
-            self.requestWeatherForLocation(long: currentCity.cityLongitude, lat: currentCity.cityLatitude)
+            self.requestWeatherForLocation(cityLongitude: currentCity.cityLongitude, cityLatitude: currentCity.cityLatitude)
         }
         
         self.currentLocationName = currentCity.cityName
@@ -158,63 +158,42 @@ class WeatherMainViewController: UIViewController {
         self.locationManager.startUpdatingLocation()
     }
     
-    func requestWeatherForLocation(long: Int, lat: Int) {
-        let url = URL(string: "https://api.openweathermap.org/data/2.5/onecall?lat=\(lat)&lon=\(long)&exclude=minutely,alerts&units=metric&appid=f1266e7ef11b56cc3e6f353b3bb2c635")!
-        // api calling helper/service should make call and this is only job it should do and not do any parsing/UI related tasks - tell me endpoint and get the raw data for me
-            // all the UI should only be handled by the VC and the parsing of the data should shoould be handled by view model as well the calling of api
-        // business logic = view model
-        
-         let task = URLSession.shared.dataTask(with: url, completionHandler: {data, response, error in
-            
-            // Validation
-            guard let data = data, error == nil else {
-                print(WeatherLocalizable.apiError.localized())
-                return
-            }
-            
-            // convert data to models object
-            var json: WeatherResponse?
-            do {
-                json = try JSONDecoder().decode(WeatherResponse.self, from: data)
-            } catch {
-                let alert = UIAlertController(title: WeatherLocalizable.error.localized(), message: "\(error)", preferredStyle: .alert)
-                let ok = UIAlertAction(title: WeatherLocalizable.ok.localized(), style: .default, handler: { action in })
-                alert.addAction(ok)
-                DispatchQueue.main.async(execute: {
-                    self.present(alert, animated: true)
-                })
-            }
-            
-            guard let results = json else {
-                return
-            }
-            
-            let dailyEntries = results.daily
-            let hourlyEntries =  Array(results.hourly[1...12])
-            
-            DispatchQueue.main.async {
-                let indexOfCurrentlySelectedCity = self.citiesWeatherModel.firstIndex { element in
-                    if (element.cityName == self.currentCityRenderableInfo?.cityName) {
-                        return true
-                    } else {
-                        return false
-                    }
+    func requestWeatherForLocation(cityLongitude: Double, cityLatitude: Double) {
+
+        WeatherService.getWeather(cityLongitude: cityLongitude, cityLatitude: cityLatitude) { weatherResponse, error in
+            if let error = error {
+                // present user facing error
+                print(error)
+            } else {
+                guard let results = weatherResponse else {
+                    return
                 }
+                let dailyEntries = results.daily
+                let hourlyEntries =  Array(results.hourly[1...12])
                 
-                var selectedCity = self.citiesWeatherModel[indexOfCurrentlySelectedCity ?? 0]
-                selectedCity.currentTemperature = results.current.temp
-                selectedCity.weatherCondition = results.current.weather
-                selectedCity.hourlyWeatherModel.append(contentsOf: hourlyEntries)
-                selectedCity.dailyWeatherModel.append(contentsOf: dailyEntries)
-                
-                self.citiesWeatherModel[indexOfCurrentlySelectedCity ?? 0] = selectedCity
-                self.currentCityRenderableInfo = selectedCity
-                self.dailyWeatherTableView.reloadData()
-                self.hourlyWeatherCollectionView.reloadData()
-                self.currentWeatherCondtionsForSelectedCity()
+                DispatchQueue.main.async {
+                    let indexOfCurrentlySelectedCity = self.citiesWeatherModel.firstIndex { element in
+                        if (element.cityName == self.currentCityRenderableInfo?.cityName) {
+                            return true
+                        } else {
+                            return false
+                        }
+                    }
+                    
+                    var selectedCity = self.citiesWeatherModel[indexOfCurrentlySelectedCity ?? 0]
+                    selectedCity.currentTemperature = results.current.temp
+                    selectedCity.weatherCondition = results.current.weather
+                    selectedCity.hourlyWeatherModel.append(contentsOf: hourlyEntries)
+                    selectedCity.dailyWeatherModel.append(contentsOf: dailyEntries)
+                    
+                    self.citiesWeatherModel[indexOfCurrentlySelectedCity ?? 0] = selectedCity
+                    self.currentCityRenderableInfo = selectedCity
+                    self.dailyWeatherTableView.reloadData()
+                    self.hourlyWeatherCollectionView.reloadData()
+                    self.currentWeatherCondtionsForSelectedCity()
+                }
             }
-        })
-        task.resume()
+        }
     }
     
     func currentWeatherCondtionsForSelectedCity() {

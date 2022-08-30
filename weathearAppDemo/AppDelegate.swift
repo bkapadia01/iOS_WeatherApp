@@ -15,17 +15,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var orientationLock = UIInterfaceOrientationMask.portrait
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-            let appearance = UINavigationBarAppearance()
-            appearance.configureWithTransparentBackground()
-            appearance.backgroundColor = UIColor.clear
-            appearance.backgroundEffect = UIBlurEffect(style: .light) // or dark
-            
-            let scrollingAppearance = UINavigationBarAppearance()
-            scrollingAppearance.configureWithTransparentBackground()
-            scrollingAppearance.backgroundColor =  UIColor.clear // your view (superview) color
-            
-            UINavigationBar.appearance().standardAppearance = appearance
-            UINavigationBar.appearance().standardAppearance = scrollingAppearance
+//            let appearance = UINavigationBarAppearance()
+//            appearance.configureWithTransparentBackground()
+//            appearance.backgroundColor = UIColor.clear
+//            appearance.backgroundEffect = UIBlurEffect(style: .light) // or dark
+//            
+//            let scrollingAppearance = UINavigationBarAppearance()
+//            scrollingAppearance.configureWithTransparentBackground()
+//            scrollingAppearance.backgroundColor =  UIColor.clear // your view (superview) color
+//            
+//            UINavigationBar.appearance().standardAppearance = appearance
+//            UINavigationBar.appearance().standardAppearance = scrollingAppearance
         return true
     }
 

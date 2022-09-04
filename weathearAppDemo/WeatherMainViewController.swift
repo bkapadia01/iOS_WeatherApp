@@ -19,12 +19,7 @@ struct RenderableCityInfo {
     var cityBackgroundImage: UIImage?
 }
 
-class WeatherMainViewController: UIViewController, citySelected {
-    func userSelectedCity(cityIndex: Int) {
-        print(cityIndex)
-    }
-    
-    
+class WeatherMainViewController: UIViewController, CitySelectedProtocol {
     @IBOutlet weak var currentInfoView: UIView!
     @IBOutlet var dailyWeatherTableView: UITableView!
     @IBOutlet weak var hourlyWeatherCollectionView: UICollectionView!
@@ -35,7 +30,7 @@ class WeatherMainViewController: UIViewController, citySelected {
     let locationManager  = CLLocationManager()
     let geoCoder = CLGeocoder()
     let cityPickerView: UIPickerView = UIPickerView()
-
+    
     let defautBackgroundImage = "defaultBackground"
     var currentLocation: CLLocation?
     var citiesWeatherModel: [RenderableCityInfo] = []
@@ -46,41 +41,42 @@ class WeatherMainViewController: UIViewController, citySelected {
     var weatherConditionLabel:UILabel = UILabel()
     var currentTemperatureLabel:UILabel = UILabel()
     
-//    override func viewWillAppear(_ animated: Bool) {
-        
-//        super.viewWillAppear(animated)
-//        DispatchQueue.main.async {
-//            self.retrieveLocationOnAppStartup()
-//        }
-        
-        // Moved search/nav bar here since there was a UI issue if you tapped on search/done repeatedly very quickly
-        // move this back to orignial positon and see if it can be handled where it should be - understand this issue better!!!
-        // 2 tricks from apple  can help with UI debugging - debug view hiearchy and slow animation
-//        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(cityPickerController))
-//    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        DispatchQueue.main.async {
-            self.retrieveLocationOnAppStartup()
-        }
-        dailyWeatherTableView.register(DailyWeatherTableViewCell.nib(), forCellReuseIdentifier: DailyWeatherTableViewCell.identifer)
-        dailyWeatherTableView.delegate = self
-        dailyWeatherTableView.dataSource = self
-
-        hourlyWeatherCollectionView.register(HourlyWeatherCollectionViewCell.nib(), forCellWithReuseIdentifier: HourlyWeatherCollectionViewCell.identifer)
-        hourlyWeatherCollectionView.delegate = self
-        hourlyWeatherCollectionView.dataSource = self
-        
+        self.retrieveLocationOnAppStartup()
+        loadDailyWeatherTableCells()
+        loadHourlyWeatherCollections()
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(cityPickerController))
     }
     
-//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-//        if segue.identifier == "showCItySelectorVIewController" {
-//            let citySelectorViewController = segue.destination as! CitySelectorViewController
-//            citySelectorViewController.delegate = self
-//        }
-//    }
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "segueMainVCToCitySelector" {
+            let secondVC: CitySelectorViewController = segue.destination as! CitySelectorViewController
+            secondVC.delegate = self
+        }
+    }
+    
+    // Protocol
+    func userSelectedCity(cityIndex: Int) {
+        print(cityIndex)
+        let currentCity = citiesWeatherModel[cityIndex]
+        reloadUIViewToClearData()
+        currentCityRenderableInfo = currentCity
+        self.requestWeatherForLocation(cityLongitude: currentCity.cityLongitude, cityLatitude: currentCity.cityLatitude)
+    }
+    
+    func loadHourlyWeatherCollections() {
+        hourlyWeatherCollectionView.register(HourlyWeatherCollectionViewCell.nib(), forCellWithReuseIdentifier: HourlyWeatherCollectionViewCell.identifer)
+        hourlyWeatherCollectionView.delegate = self
+        hourlyWeatherCollectionView.dataSource = self
+    }
+    
+    func loadDailyWeatherTableCells() {
+        dailyWeatherTableView.register(DailyWeatherTableViewCell.nib(), forCellReuseIdentifier: DailyWeatherTableViewCell.identifer)
+        dailyWeatherTableView.delegate = self
+        dailyWeatherTableView.dataSource = self
+    }
     
     //MARK: List of city data
     private func cityData() {
@@ -93,90 +89,21 @@ class WeatherMainViewController: UIViewController, citySelected {
         if !(currentLocationName == "Toronto") {
             currentLocationName = defautBackgroundImage
         }
-                
+        
         let currentLocationForecast = RenderableCityInfo(cityLongitude: cityLongitude, cityLatitude: cityLatitude, cityName: WeatherLocalizable.currentLocation.localized(), currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: currentLocationName))
         let chicagoForecast = RenderableCityInfo(cityLongitude: -87.623, cityLatitude: 41.881, cityName: WeatherLocalizable.cityChicago.localized(),  currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityChicago.localized()))
         let londonForecast = RenderableCityInfo(cityLongitude: -0.118, cityLatitude: 51.509, cityName:WeatherLocalizable.cityLondon.localized(),  currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityLondon.localized()))
         let tokyoForecast = RenderableCityInfo(cityLongitude: 139.839, cityLatitude: 35.65, cityName: WeatherLocalizable.cityTokyo.localized(),  currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityTokyo.localized()))
         let sydneyForecast = RenderableCityInfo(cityLongitude: 151.20, cityLatitude: -33.86, cityName: WeatherLocalizable.citySydney.localized(),  currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.citySydney.localized()))
         let berlinForecast = RenderableCityInfo(cityLongitude: 13.404, cityLatitude: 52.520, cityName: WeatherLocalizable.cityBerlin.localized(),  currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityBerlin.localized()))
-        
-        // instead of emty hourly and daily weaather model arrays - we can do a city picker objec tthat only has names - long/lat for the city - everything with empty array would be another object...each vc represents a screen and respective model with each view, so home would have different model than the picker model
-            // so main page only renders only the model for the city selected
-        // limit the size of class to just do 1 thing only
-            // MVVM allows to use a template to break up the logic into logical parts
-            // break 1 class into 2 -> grouping functions in the logic portion -> retriving data can be a service that can be another class - so now the view model is split into 2 now
-        //
         citiesWeatherModel = [currentLocationForecast,chicagoForecast,londonForecast,tokyoForecast,sydneyForecast,berlinForecast]
     }
     
     //MARK: City picker view with selection of cities and navigation bar
     @objc func cityPickerController() {
-//        navigationController?.setNavigationBarHidden(true, animated: true)
-//
-//        cityPickerView.frame = CGRect(x: 0, y: 200, width: view.frame.width, height: view.frame.height)
-//        cityPickerView.autoresizingMask = .flexibleHeight
-//        cityPickerView.backgroundColor = .init(white: 0.9, alpha: 0.9)
-//        cityPickerView.delegate = self
-//        cityPickerView.dataSource = self
-//        cityPickerView.isHidden = false
-//        let indexOfCurrentlySelectedCity = citiesWeatherModel.firstIndex { element in
-//            if (element.cityName == currentCityRenderableInfo?.cityName) {
-//                return true
-//            } else {
-//                return false
-//            }
-//        }
-//        cityPickerView.selectRow(indexOfCurrentlySelectedCity ?? 0, inComponent: 0, animated: false)
-//        self.view.addSubview(cityPickerView)
-//        cityPickerView.center = self.view.center
-//
-//        // NavBar options
-//        let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(self.doneButtonTapped))
-//        let navBarSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-//        let cancelButton = UIBarButtonItem(title: WeatherLocalizable.cancel.localized(), style: .plain, target: self, action: #selector(self.canceButtonTapped))
-//
-//        navBarAccessory = UIToolbar(frame: CGRect(x: 0, y: 0, width: cityPickerView.frame.width, height: 70))
-//        navBarAccessory.barStyle = .default
-//        navBarAccessory.isTranslucent = false
-//        navBarAccessory.isUserInteractionEnabled = true
-//        navBarAccessory.items = [cancelButton, navBarSpace, doneButton]
-//        self.view.addSubview (navBarAccessory)
         self.performSegue(withIdentifier: "segueMainVCToCitySelector", sender: self)
-        
-//        let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
-//
-//        let newViewController = storyBoard.instantiateViewController(withIdentifier: "CitySelectorViewController") as! CitySelectorViewController
-//        self.navigationController?.show(newViewController, sender: self)
-//        self.show(newViewController, sender: self)
-//        self.present(newViewController, animated: true, completion: nil)
-        
     }
     
-    @objc func doneButtonTapped() {
-//        let indexOfCurrentlySelectedCity = cityPickerView.selectedRow(inComponent: 0)
-//        let currentCity = citiesWeatherModel[indexOfCurrentlySelectedCity]
-//        currentCityRenderableInfo = currentCity
-//
-//        DispatchQueue.main.async {
-//            self.requestWeatherForLocation(cityLongitude: currentCity.cityLongitude, cityLatitude: currentCity.cityLatitude)
-//        }
-//
-//        self.currentLocationName = currentCity.cityName
-//        if indexOfCurrentlySelectedCity == 0 {
-//            self.locationManager.requestLocation()
-//            self.locationManager.stopUpdatingLocation()
-//        }
-//        cityPickerView.isHidden = true
-//        navBarAccessory.isHidden = true
-//        self.navigationController?.isNavigationBarHidden = false
-    }
-    
-    @objc func canceButtonTapped() {
-//        cityPickerView.isHidden = true
-//        navBarAccessory.isHidden = true
-//        self.navigationController?.isNavigationBarHidden = false
-    }
     
     func retrieveLocationOnAppStartup() {
         self.locationManager.delegate = self
@@ -185,7 +112,7 @@ class WeatherMainViewController: UIViewController, citySelected {
     }
     
     func requestWeatherForLocation(cityLongitude: Double, cityLatitude: Double) {
-
+        
         WeatherService.getWeather(cityLongitude: cityLongitude, cityLatitude: cityLatitude) { weatherResponse, error in
             if let error = error {
                 // present user facing error
@@ -228,10 +155,10 @@ class WeatherMainViewController: UIViewController, citySelected {
             return
         }
         let weatherIcon = currentSelectedCity.weatherCondition[0].main.lowercased()
-
-//        currentInfoView.backgroundColor = UIColor(red: 200/255, green: 200/255, blue: 200/255, alpha: 0.3)
-        locationLabel =  UILabel(frame: CGRect(x: 15, y: 60, width: view.frame.size.width - 20, height: currentInfoView.frame.size.height/5))
-        weatherConditionLabel = UILabel(frame: CGRect(x: 15, y: 60 + locationLabel.frame.size.height, width: view.frame.size.width - 20, height: currentInfoView.frame.size.height/15))
+        
+        currentInfoView.backgroundColor = UIColor(red: 200/255, green: 200/255, blue: 200/255, alpha: 0.3)
+        locationLabel =  UILabel(frame: CGRect(x: 15, y: 60, width: view.frame.size.width - 20, height: currentInfoView.frame.size.height/4))
+        weatherConditionLabel = UILabel(frame: CGRect(x: 15, y: 20 + locationLabel.frame.size.height, width: view.frame.size.width - 20, height: currentInfoView.frame.size.height/20))
         currentTemperatureLabel = UILabel(frame: CGRect(x: 15, y: 60 + weatherConditionLabel.frame.size.height + locationLabel.frame.size.height, width: view.frame.size.width - 20, height: currentInfoView.frame.size.height/10))
         
         self.currentConditions.contentMode = .scaleAspectFit
@@ -251,7 +178,6 @@ class WeatherMainViewController: UIViewController, citySelected {
         } else if weatherIcon.contains("clouds") {
             self.currentConditions.image = UIImage(named: "cloud")
         }
-    
         currentInfoView.addSubview(locationLabel)
         currentInfoView.addSubview(weatherConditionLabel)
         currentInfoView.addSubview(currentTemperatureLabel)
@@ -268,33 +194,10 @@ class WeatherMainViewController: UIViewController, citySelected {
         locationLabel.font = UIFont(name: "Helvetica", size: 22)
         locationLabel.text = currentSelectedCity.cityName
         
-//        addGreyBackgroundToLabel(label: weatherConditionLabel)
-//        addGreyBackgroundToLabel(label: currentTemperatureLabel)
-//        addGreyBackgroundToLabel(label: locationLabel)
-        
         hourlyWeatherCollectionView.layer.borderColor = UIColor.lightGray.cgColor
         hourlyWeatherCollectionView.layer.borderWidth = 1.0
         hourlyWeatherCollectionView.layer.cornerRadius = 3.0
     }
-//
-//    func reloadUIViewToClearData() {
-//        let parent = self.view.superview
-//        self.view.removeFromSuperview()
-//        self.view = nil
-//        parent?.addSubview(self.view)
-//    }
-    
-//    func addGreyBackgroundToLabel(label: UILabel) {
-//        label.backgroundColor = UIColor.gray.withAlphaComponent(0.3)
-//
-//        let maskLayer = CAGradientLayer()
-//        maskLayer.frame = label.bounds
-//        maskLayer.shadowPath = CGPath(roundedRect: label.bounds.insetBy(dx: 40, dy: -10), cornerWidth: 15, cornerHeight: 5, transform: nil)
-//        maskLayer.shadowOpacity =  1
-//        maskLayer.shadowOffset = CGSize.zero
-//        maskLayer.shadowColor = UIColor.white.cgColor
-//        label.layer.mask = maskLayer
-//    }
 }
 
 //MARK: Daily Weather Table View
@@ -317,13 +220,25 @@ extension WeatherMainViewController:  UITableViewDelegate, UITableViewDataSource
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: DailyWeatherTableViewCell.identifer, for: indexPath) as! DailyWeatherTableViewCell
         cell.selectionStyle = .none
-
+        
         guard let currentCity = currentCityRenderableInfo else {
             return cell
         }
         cell.configureWithModel(with: currentCity.dailyWeatherModel[indexPath.row])
         return cell
     }
+    
+    func reloadUIViewToClearData() {
+        currentTemperatureLabel.removeFromSuperview()
+        weatherConditionLabel.removeFromSuperview()
+        locationLabel.removeFromSuperview()
+
+//        let parent = self.view.superview
+//        self.view.removeFromSuperview()
+//        self.view = nil
+//        parent?.addSubview(self.view)
+    }
+    
 }
 
 //MARK: Hourly Weather Table View
@@ -342,8 +257,7 @@ extension WeatherMainViewController:UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        view.translatesAutoresizingMaskIntoConstraints = false
- 
+        
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HourlyWeatherCollectionViewCell.identifer, for: indexPath) as! HourlyWeatherCollectionViewCell
         guard let currentCity = currentCityRenderableInfo else {
             return cell
@@ -352,26 +266,6 @@ extension WeatherMainViewController:UICollectionViewDataSource {
         return cell
     }
 }
-//
-////MARK: City picker view
-//extension WeatherMainViewController: UIPickerViewDelegate, UIPickerViewDataSource {
-//    func numberOfComponents(in pickerView: UIPickerView) -> Int {
-//        return 1
-//    }
-//    
-//    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-//        return citiesWeatherModel.count
-//    }
-//    
-//    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-//        let city = citiesWeatherModel[row]
-//        return city.cityName
-//    }
-//    
-//    // do not selecte city/row since I handle this only if "Done" is selected
-//    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-//    }
-//}
 
 
 //MARK: Current Location Manager
@@ -399,13 +293,5 @@ extension WeatherMainViewController: CLLocationManagerDelegate {
                 self.cityData()
             }
         })
-    }
-}
-
-extension String {
-    func localized() -> String{
-        var fileName = String()
-        fileName = "WeatherLocalizable"
-        return NSLocalizedString(self, tableName: fileName, bundle: Bundle.main, value: String(), comment: String())
     }
 }

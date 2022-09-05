@@ -7,7 +7,7 @@
 
 import UIKit
 import CoreLocation
-// group this (MARK) with like items and take common MARKED items into their own class -> gives blueprint of modularizing things
+
 struct RenderableCityInfo {
     var cityLongitude: Double
     var cityLatitude: Double
@@ -232,11 +232,6 @@ extension WeatherMainViewController:  UITableViewDelegate, UITableViewDataSource
         currentTemperatureLabel.removeFromSuperview()
         weatherConditionLabel.removeFromSuperview()
         locationLabel.removeFromSuperview()
-
-//        let parent = self.view.superview
-//        self.view.removeFromSuperview()
-//        self.view = nil
-//        parent?.addSubview(self.view)
     }
     
 }

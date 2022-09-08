@@ -78,28 +78,6 @@ class WeatherMainViewController: UIViewController, CitySelectedProtocol {
         dailyWeatherTableView.dataSource = self
     }
     
-    //MARK: List of city data
-//    private func cityData() {
-//        guard let currentLocation = currentLocation else {
-//            return
-//        }
-//        let cityLongitude: Double = currentLocation.coordinate.longitude
-//        let cityLatitude: Double = currentLocation.coordinate.latitude
-//
-//        if !(currentLocationName == "Toronto") {
-//            currentLocationName = defautBackgroundImage
-//        }
-//
-//        let currentLocationForecast = RenderableCityInfo(cityLongitude: cityLongitude, cityLatitude: cityLatitude, cityName: WeatherLocalizable.currentLocation.localized(), currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: currentLocationName))
-//        let chicagoForecast = RenderableCityInfo(cityLongitude: -87.623, cityLatitude: 41.881, cityName: WeatherLocalizable.cityChicago.localized(),  currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityChicago.localized()))
-//        let londonForecast = RenderableCityInfo(cityLongitude: -0.118, cityLatitude: 51.509, cityName:WeatherLocalizable.cityLondon.localized(),  currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityLondon.localized()))
-//        let tokyoForecast = RenderableCityInfo(cityLongitude: 139.839, cityLatitude: 35.65, cityName: WeatherLocalizable.cityTokyo.localized(),  currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityTokyo.localized()))
-//        let sydneyForecast = RenderableCityInfo(cityLongitude: 151.20, cityLatitude: -33.86, cityName: WeatherLocalizable.citySydney.localized(),  currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.citySydney.localized()))
-//        let berlinForecast = RenderableCityInfo(cityLongitude: 13.404, cityLatitude: 52.520, cityName: WeatherLocalizable.cityBerlin.localized(),  currentTemperature: 0, weatherCondition: [], dailyWeatherModel: [], hourlyWeatherModel: [], cityBackgroundImage: UIImage(named: WeatherLocalizable.cityBerlin.localized()))
-//
-//        citiesWeatherModel = [currentLocationForecast,chicagoForecast,londonForecast,tokyoForecast,sydneyForecast,berlinForecast]
-//    }
-//
     //MARK: City picker view with selection of cities and navigation bar
     @objc func cityPickerController() {
         self.performSegue(withIdentifier: "segueMainVCToCitySelector", sender: self)
@@ -127,13 +105,6 @@ class WeatherMainViewController: UIViewController, CitySelectedProtocol {
                 let hourlyEntries =  Array(results.hourly[1...12])
                 
                 DispatchQueue.main.async {
-//                    let indexOfCurrentlySelectedCity = self.citiesWeatherModel.firstIndex { element in
-//                        if (element.cityName == self.currentCityRenderableInfo?.cityName) {
-//                            return true
-//                        } else {
-//                            return false
-//                        }
-//                    }
                     
                     self.currentCityRenderableInfo = RenderableCityInfo(cityLongitude: cityLongitude,
                                                                      cityLatitude: cityLatitude,
@@ -143,16 +114,6 @@ class WeatherMainViewController: UIViewController, CitySelectedProtocol {
                                                                      dailyWeatherModel: dailyEntries,
                                                                      hourlyWeatherModel: hourlyEntries,
                                                                      cityBackgroundImage: UIImage(named: cityName))
-
-                    
-//                    var selectedCity = self.citiesWeatherModel[]
-//                    selectedCity.currentTemperature = results.current.temp
-//                    selectedCity.weatherCondition = results.current.weather
-//                    selectedCity.hourlyWeatherModel.append(contentsOf: hourlyEntries)
-//                    selectedCity.dailyWeatherModel.append(contentsOf: dailyEntries)
-//
-//                    self.citiesWeatherModel[indexOfCurrentlySelectedCity ?? 0] = selectedCity
-//                    self.currentCityRenderableInfo = selectedCity
                     self.dailyWeatherTableView.reloadData()
                     self.hourlyWeatherCollectionView.reloadData()
                     self.currentWeatherCondtionsForSelectedCity()

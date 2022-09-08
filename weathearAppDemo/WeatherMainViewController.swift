@@ -107,7 +107,7 @@ class WeatherMainViewController: UIViewController, CitySelectedProtocol {
                     
                     self.currentCityRenderableInfo = RenderableCityInfo(cityLongitude: cityLongitude,
                                                                         cityLatitude: cityLatitude,
-                                                                        cityName: WeatherLocalizable.currentLocation.localized(),
+                                                                        cityName: cityName,
                                                                         currentTemperature: results.current.temp,
                                                                         weatherCondition: results.current.weather,
                                                                         dailyWeatherModel: dailyEntries,

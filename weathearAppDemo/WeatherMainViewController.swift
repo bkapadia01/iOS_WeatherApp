@@ -20,7 +20,7 @@ struct RenderableCityInfo {
 }
 
 class WeatherMainViewController: UIViewController, CitySelectedProtocol {
-
+    
     @IBOutlet weak var currentInfoView: UIView!
     @IBOutlet var dailyWeatherTableView: UITableView!
     @IBOutlet weak var hourlyWeatherCollectionView: UICollectionView!
@@ -34,7 +34,6 @@ class WeatherMainViewController: UIViewController, CitySelectedProtocol {
     
     let defautBackgroundImage = "default"
     var currentLocation: CLLocation?
-//    var citiesWeatherModel: [RenderableCityInfo] = []
     var currentCityRenderableInfo:RenderableCityInfo?
     var currentLocationName: String = ""
     var navBarAccessory:UIToolbar = UIToolbar()
@@ -65,7 +64,7 @@ class WeatherMainViewController: UIViewController, CitySelectedProtocol {
                                   cityName: cityName)
     }
     
-
+    
     func loadHourlyWeatherCollections() {
         hourlyWeatherCollectionView.register(HourlyWeatherCollectionViewCell.nib(), forCellWithReuseIdentifier: HourlyWeatherCollectionViewCell.identifer)
         hourlyWeatherCollectionView.delegate = self
@@ -107,13 +106,13 @@ class WeatherMainViewController: UIViewController, CitySelectedProtocol {
                 DispatchQueue.main.async {
                     
                     self.currentCityRenderableInfo = RenderableCityInfo(cityLongitude: cityLongitude,
-                                                                     cityLatitude: cityLatitude,
-                                                                     cityName: WeatherLocalizable.currentLocation.localized(),
-                                                                     currentTemperature: results.current.temp,
-                                                                     weatherCondition: results.current.weather,
-                                                                     dailyWeatherModel: dailyEntries,
-                                                                     hourlyWeatherModel: hourlyEntries,
-                                                                     cityBackgroundImage: UIImage(named: cityName))
+                                                                        cityLatitude: cityLatitude,
+                                                                        cityName: WeatherLocalizable.currentLocation.localized(),
+                                                                        currentTemperature: results.current.temp,
+                                                                        weatherCondition: results.current.weather,
+                                                                        dailyWeatherModel: dailyEntries,
+                                                                        hourlyWeatherModel: hourlyEntries,
+                                                                        cityBackgroundImage: UIImage(named: cityName))
                     self.dailyWeatherTableView.reloadData()
                     self.hourlyWeatherCollectionView.reloadData()
                     self.currentWeatherCondtionsForSelectedCity()
@@ -240,7 +239,6 @@ extension WeatherMainViewController: CLLocationManagerDelegate {
                 if let city = placemark.locality { self.currentLocationName = city}
                 self.locationManager.stopUpdatingLocation()
                 self.requestWeatherForLocation(cityLongitude: (currentLocation?.coordinate.longitude) ?? -79.347, cityLatitude: (currentLocation?.coordinate.latitude) ?? 43.651, cityName: self.currentLocationName)
-//                self.cityData()
             }
         })
     }

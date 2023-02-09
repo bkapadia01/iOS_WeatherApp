@@ -3,6 +3,12 @@
 ### Weather App - TB Project 2
 This is an iOS weather app built using the Open Weather API. The app displays the current forecast, hourly forecast and daily forecast and a picker view to select a city from the predefined selection of cities.
 
+![ezgif-2-3fa03f3ef2](https://user-images.githubusercontent.com/26723281/217882166-3d7f16ed-759c-41e8-8a5f-347bfbe0ad1d.gif)
+![Simulator Screen Shot - iPhone 12 - 2023-02-09 at 11 38 09](https://user-images.githubusercontent.com/26723281/217882329-12c731d5-51f8-4bb6-9cd1-bd0b4fd67bbe.png)
+![Simulator Screen Shot - iPhone 12 - 2023-02-09 at 11 37 50](https://user-images.githubusercontent.com/26723281/217882345-f0d99997-b6a6-424d-8167-ce33caae0cfd.png)
+
+
+
 ### Current Location: 
 The app uses the current latitude and longitude of the device and identifies the city the device is in. The search icon presents a city picker that is pre-populated with several popular locations and provides the forecast for these locations. The background image is updated based on the city selected.
 
